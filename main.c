@@ -1,10 +1,10 @@
 /*
- * File:   newmain.c
+ * File:   main.c
  * Author: Willians Fernando de Oliveira / Matheus Jose Ferreira Borelli
  * Created on 27 de Julho de 2024, 16:54
  */
 
-//define a frequência em 48MHz
+// define a frequência em 48MHz
 #define _XTAL_FREQ 48000000 
 
 // inclusao de bibliotecas
@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 
-// Botoes
+// botoes
 #define BOTAO_CAFE_CURTO     PORTAbits.RA0
 #define BOTAO_CAFE_LONGO     PORTAbits.RA1
 #define BOTAO_CAFE_COM_LEITE PORTAbits.RA2
@@ -23,18 +23,11 @@
 #define BOTAO_CHOCOLEITE     PORTAbits.RA5
 #define BOTAO_RESET          PORTAbits.RA6
 
-// Sensor
+// sensor
 #define SENSOR_CAPACITIVO PORTCbits.RC0
 
-// Indicadores (LEDs)
-#define ENTRADA_AGUA_QUENTE_ESQUERDA       PORTBbits.RB0
-#define ENTRADA_AGUA_QUENTE_DIREITA        PORTBbits.RB1
-#define ACIONAMENTO_MIXER_ESQUERDA         PORTBbits.RB2
-#define ACIONAMENTO_MIXER_DIREITA          PORTBbits.RB3
-#define ACIONAMENTO_MOLA_DOSAGEM_CHOCOLATE PORTBbits.RB4
-#define ACIONAMENTO_MOLA_DOSAGEM_LEITE     PORTBbits.RB5
-#define ACIONAMENTO_MOLA_DOSAGEM_CAFE      PORTBbits.RB6
-#define ENERGIZACAO_TERMOBLOCO             PORTBbits.RB7
+// indicadores
+#define AQUECIMENTO_TERMOBLOCO PORTBbits.RB7
 
 void setup(void){
     // componentes
@@ -51,9 +44,8 @@ void setup(void){
     TRISCbits.RC0 = 1;
     SENSOR_CAPACITIVO = 0;
 }
-
-// Função para criar um delay em segundos
-void delaySegundos(unsigned int segundos) {
+   // Função para criar um delay em milisegundos
+void delayMilisegundos(unsigned int milisegundos) {
     unsigned int i;
 
     // Configuração do Timer1
@@ -61,20 +53,19 @@ void delaySegundos(unsigned int segundos) {
     T1CONbits.TMR1CS = 0; // Seleciona o oscilador interno (Fosc/4)
     T1CONbits.T1CKPS = 0b11; // Prescaler de 1:8
 
-    // Calcular o preload para 1 segundo
+    // Calcular o preload para 1 milissegundo
     // Timer1 overflow ocorre a cada 65536 ciclos de clock
     // Fosc = 48MHz, então Fosc/4 = 12MHz, Prescaler 1:8
     // Timer1 incrementa a cada 0,6667µs (8 / 12MHz)
-    // Para 1 segundo (1.000.000µs), precisamos de 1.000.000µs / 0,6667µs ≈ 1.500.000 ciclos de timer
-    // Como Timer1 conta até 65536, precisamos de múltiplos ciclos de Timer1 para chegar a 1 segundo
-    // Número de ciclos necessários = 1.500.000 / 65536 ≈ 22.875
-    // Preload = 65536 - (1.000.000µs / 0,6667µs) % 65536
+    // Para 1 milissegundo (1.000µs), precisamos de 1.000µs / 0,6667µs ≈ 1500 ciclos de timer
+    // Como Timer1 conta até 65536, precisamos de múltiplos ciclos de Timer1 para chegar a 1 milissegundo
+    // Preload = 65536 - 1500
 
     // Simplificando o cálculo
-    unsigned int overflowCount = 23; // Número de overflows necessários
-    unsigned int preload = 65536 - (1500000UL % 65536); // Preload calculado
+    unsigned int overflowCount = 1; // Número de overflows necessários para 1ms
+    unsigned int preload = 65536 - 1500; // Preload calculado para 1ms
 
-    for (i = 0; i < segundos; i++) {
+    for (i = 0; i < milisegundos; i++) {
         for (unsigned int j = 0; j < overflowCount; j++) {
             TMR1H = (preload >> 8) & 0xFF; // Carregar valor alto do Timer1
             TMR1L = preload & 0xFF; // Carregar valor baixo do Timer1
@@ -95,7 +86,7 @@ void preAquecimento(void){
     imprime_string_lcd("Em aquecimento"); //envia String para o Display LCD 
     lcd_posicao (2,1);// desloca o cursor para a posicao determinada
     imprime_string_lcd("Aguarde..."); //envia String para o Display LCD
-    delaySegundos(8);
+    delayMilisegundos(8000);
 }
 
 void maquinaPronta(void){
@@ -113,7 +104,7 @@ void bebidaPronta(void){
     imprime_string_lcd("Bebida pronta"); //envia String para o Display LCD 
     lcd_posicao (2,1);// desloca o cursor para a posicao determinada
     imprime_string_lcd("Sirva-se!"); //envia String para o Display LCD
-    delaySegundos(3);  
+    delayMilisegundos(3000);  
 }
 
 void selecaoBebidas(int num_bebida){
@@ -150,78 +141,73 @@ void selecaoBebidas(int num_bebida){
 }
 
 void cafeCurto(){
-    // Feito - conferir
     PORTB = 0b11001010; // entrada de agua - direita, mixer - direita, molas de dosagem - cafe
-    delaySegundos(5);  
+    delayMilisegundos(5000);  
     PORTB = 0b10001010; // 5 segundos -  cessa mola de dosagem
-    delaySegundos(8); // 
+    delayMilisegundos(8000); // 
     PORTB = 0b10001000; // 13 segundos - cessa entrada de agua
-    delaySegundos(0.25);
+    delayMilisegundos(250);
     PORTB = 0b10000000; // encerrado
     bebidaPronta();    
 }
 
 void cafeLongo(){
-    // Feito - Conferir
     PORTB = 0b11001010; // entrada de agua - direita, mixer - direta, molas de dosagem - cafe
-    delaySegundos(10); 
+    delayMilisegundos(1000); 
     PORTB = 0b10001010; // 10 segundos -  cessa mola de dosagem
-    delaySegundos(13); 
+    delayMilisegundos(13000); 
     PORTB = 0b10001000; // 23 segundos - cessa entrada de agua
-    delaySegundos(0.25); 
+    delayMilisegundos(250); 
     PORTB = 0b10000000; // encerrado
     bebidaPronta(); 
 }
 
 void cafeComLeite(){
-    // Feito - conferir
     PORTB = 0b11101111; // entrada de agua - direita e esquerda, mixer - esquerda e direita, molas de dosagem - cafe e leite
-    delaySegundos(5); 
+    delayMilisegundos(5000); 
     PORTB = 0b10100101; // 5 segundos - cessa entrada de agua - direita, mixer - direita e mola de dosagem - cafe
-    delaySegundos(10); 
+    delayMilisegundos(10000); 
     PORTB = 0b10000101; // 15 segundos - cessa mola de dosagem - leite
-    delaySegundos(6); 
+    delayMilisegundos(6000); 
     PORTB = 0b10000100; // 21 segundos - cessa entrada de agua -  esquerda
-    delaySegundos(0.25);
+    delayMilisegundos(250);
     PORTB = 0b10000000; // encerrado
     bebidaPronta();   
 }
 
 void cappuccino(){
-    // Feito - conferir
     PORTB = 0b11111111; // entrada de agua - direita e esquerda, mixer - esquerda e direita, molas de dosagem - chocolate, leite e cafe
-    delaySegundos(5); 
+    delayMilisegundos(5000); 
     PORTB = 0b10110101; // 5 segundos - cessa entrada de agua - direita, mixer - direita e mola de dosagem - cafe
-    delaySegundos(5); 
+    delayMilisegundos(5000); 
     PORTB = 0b10010101; // 10 segundos - cessa mola de dosagem - leite
-    delaySegundos(5); 
+    delayMilisegundos(5000); 
     PORTB = 0b10000101; // 15 segundos - cessa mola de dosagem -  chocolate
-    delaySegundos(5);
+    delayMilisegundos(5000);
     PORTB = 0b10000100; // 20 segundos - cessa entrada de agua - esquerda
-    delaySegundos(0.25);
+    delayMilisegundos(250);
     PORTB = 0b10000000; // encerrado
     bebidaPronta();     
 }
 
 void chocolate(){
-    // Feito - Conferir
     PORTB = 0b10010101; // entrada de agua - esquerda, mixer - esquerda, molas de dosagem - chocolate
-    delaySegundos(20); 
-    PORTB = 0b10001010; // 20 segundos -  cessa mola de dosagem - chocolate
-    delaySegundos(1); 
-    PORTB = 0b10001000; // 21 segundos - cessa entrada de agua - esquerda
-    delaySegundos(0.25); 
+    delayMilisegundos(20000); 
+    PORTB = 0b10000101; // 20 segundos -  cessa mola de dosagem - chocolate
+    delayMilisegundos(1000); 
+    PORTB = 0b10000100; // 21 segundos - cessa entrada de agua - esquerda
+    delayMilisegundos(250); 
     PORTB = 0b10000000; // encerrado
     bebidaPronta();  
 }
 
 void chocoleite(){
     PORTB = 0b10110101; // entrada de agua - esquerda, mixer - esquerda, molas de dosagem - chocolate e leite
-    delaySegundos(15); // 
+    delayMilisegundos(15000); // 
     PORTB = 0b10000101; // 15 segundos - cessa molas de dosagem - chocolate e leite
-    delaySegundos(5); // 
+    delayMilisegundos(5000); // 
     PORTB = 0b10000101; // cessa entrada de agua - esquerda
-    delaySegundos(0.25); // 
+    delayMilisegundos(250); // 
     PORTB = 0b10000000; // encerrado
     bebidaPronta(); 
 }
@@ -254,42 +240,41 @@ void prepararBebida(int num_bebida){
 void main(void) {
     setup();
     preAquecimento();
-    
     int estado = 0;
     int escolha = -1;
-
     while(1){
-        ENERGIZACAO_TERMOBLOCO = 1;
+        AQUECIMENTO_TERMOBLOCO = 1;
         maquinaPronta();
         if (SENSOR_CAPACITIVO == 1){
+            delayMilisegundos(100);
             if (BOTAO_CAFE_CURTO == 0 && estado == 0){
                 escolha = 0;
                 estado = 1;
-                __delay_ms(100); // espera um pouco, trata o debounce
+                delayMilisegundos(100); // espera um pouco, trata o debounce
             } else if (BOTAO_CAFE_LONGO == 0 && estado == 0) {
                 escolha = 1;
                 estado = 1;
-                __delay_ms(100); 
+                delayMilisegundos(100); 
             } else if (BOTAO_CAFE_COM_LEITE == 0 && estado == 0) {
                 escolha = 2;
                 estado = 1;
-                __delay_ms(100); 
+                delayMilisegundos(100); 
             } else if (BOTAO_CAPPUCCINO == 0 && estado == 0) {
                 escolha = 3;
                 estado = 1;
-                __delay_ms(100); 
+                delayMilisegundos(100); 
             } else if (BOTAO_CHOCOLATE == 0 && estado == 0) {
                 escolha = 4;
                 estado = 1;
-                __delay_ms(100); 
+                delayMilisegundos(100); 
             } else if (BOTAO_CHOCOLEITE == 0 && estado == 0) {
                 escolha = 5;
                 estado = 1 ;
-                __delay_ms(100); 
+                delayMilisegundos(100); 
             } else if (BOTAO_RESET == 0 && estado == 0) {
                 escolha = 6;
                 estado = 1;
-                __delay_ms(100); 
+                delayMilisegundos(100); 
             } else {
                 continue;
             }   
