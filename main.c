@@ -31,10 +31,8 @@
 
 void setup(void){
     // componentes
-    TRISA = 0xFF; // configura todos os pinos de PORTA (botoes) como entrada (0xFF = 11111111)
-    PORTA = 0xFF;
     TRISB = 0x00; // configura todos os pinos PORTB (leds indicadores) como saida (0x00 = 00000000)
- 
+    LATB  = 0x00;
     // display
     TRISD = 0x00; //RD0 a RD7 - saída para o LCD
     PORTD = 0x00; //Coloca portD em 0V.
@@ -43,8 +41,11 @@ void setup(void){
     // sensor capacitivo
     TRISCbits.RC0 = 1;
     SENSOR_CAPACITIVO = 0;
-}
 
+    TRISA = 0xFF; // configura todos os pinos de PORTA (botoes) como entrada (0xFF = 11111111)
+    ADCON1 = 0b00001111;
+    PORTA = 0xFF;
+}
    // Função para criar um delay em milisegundos
 void delayMilisegundos(unsigned int milisegundos) {
     unsigned int i;
@@ -154,7 +155,7 @@ void cafeCurto(){
 
 void cafeLongo(){
     PORTB = 0b11001010; // entrada de agua - direita, mixer - direta, molas de dosagem - cafe
-    delayMilisegundos(1000); 
+    delayMilisegundos(10000); 
     PORTB = 0b10001010; // 10 segundos -  cessa mola de dosagem
     delayMilisegundos(13000); 
     PORTB = 0b10001000; // 23 segundos - cessa entrada de agua
@@ -207,7 +208,7 @@ void chocoleite(){
     delayMilisegundos(15000); // 
     PORTB = 0b10000101; // 15 segundos - cessa molas de dosagem - chocolate e leite
     delayMilisegundos(5000); // 
-    PORTB = 0b10000101; // cessa entrada de agua - esquerda
+    PORTB = 0b10000100; // cessa entrada de agua - esquerda
     delayMilisegundos(250); // 
     PORTB = 0b10000000; // encerrado
     bebidaPronta(); 
@@ -237,7 +238,7 @@ void prepararBebida(int num_bebida){
             break;  
     }
 }
- 
+
 void main(void) {
     setup();
     preAquecimento();
@@ -247,39 +248,39 @@ void main(void) {
         AQUECIMENTO_TERMOBLOCO = 1;
         maquinaPronta();
         if (SENSOR_CAPACITIVO == 1){
-            if (BOTAO_CAFE_CURTO == 0 && estado == 0){
-                escolha = 0;
-                estado = 1;
-                delayMilisegundos(100); // espera um pouco, trata o debounce
-            } else if (BOTAO_CAFE_LONGO == 0 && estado == 0) {
-                escolha = 1;
-                estado = 1;
-                delayMilisegundos(100); 
-            } else if (BOTAO_CAFE_COM_LEITE == 0 && estado == 0) {
-                escolha = 2;
-                estado = 1;
-                delayMilisegundos(100); 
-            } else if (BOTAO_CAPPUCCINO == 0 && estado == 0) {
-                escolha = 3;
-                estado = 1;
-                delayMilisegundos(100); 
-            } else if (BOTAO_CHOCOLATE == 0 && estado == 0) {
-                escolha = 4;
-                estado = 1;
-                delayMilisegundos(100); 
-            } else if (BOTAO_CHOCOLEITE == 0 && estado == 0) {
-                escolha = 5;
-                estado = 1 ;
-                delayMilisegundos(100); 
-            } else if (BOTAO_RESET == 0 && estado == 0) {
-                escolha = 6;
-                estado = 1;
-                delayMilisegundos(100); 
-            } else {
-                continue;
-                delayMilisegundos(100); 
-                estado = 1;
-            }   
+            while (escolha == -1)
+            {
+                if (BOTAO_CAFE_CURTO == 0 && estado == 0){
+                    escolha = 0;
+                    estado = 1;
+                    delayMilisegundos(100); // espera um pouco, trata o debounce
+                } else if (BOTAO_CAFE_LONGO == 0 && estado == 0) {
+                    escolha = 1;
+                    estado = 1;
+                    delayMilisegundos(100); 
+                } else if (BOTAO_CAFE_COM_LEITE == 0 && estado == 0) {
+                    escolha = 2;
+                    estado = 1;
+                    delayMilisegundos(100); 
+                } else if (BOTAO_CAPPUCCINO == 0 && estado == 0) {
+                    escolha = 3;
+                    estado = 1;
+                    delayMilisegundos(100); 
+                } else if (BOTAO_CHOCOLATE == 0 && estado == 0) {
+                    escolha = 4;
+                    estado = 1;
+                    delayMilisegundos(100); 
+                } else if (BOTAO_CHOCOLEITE == 0 && estado == 0) {
+                    escolha = 5;
+                    estado = 1 ;
+                    delayMilisegundos(100); 
+                } else if (BOTAO_RESET == 0 && estado == 0) {
+                    escolha = 6;
+                    estado = 1;
+                    delayMilisegundos(100); 
+                } 
+            }
+            
             selecaoBebidas(escolha);
             prepararBebida(escolha);
             SENSOR_CAPACITIVO = 0;
