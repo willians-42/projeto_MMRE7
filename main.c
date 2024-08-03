@@ -44,6 +44,7 @@ void setup(void){
     TRISCbits.RC0 = 1;
     SENSOR_CAPACITIVO = 0;
 }
+
    // Função para criar um delay em milisegundos
 void delayMilisegundos(unsigned int milisegundos) {
     unsigned int i;
@@ -236,7 +237,7 @@ void prepararBebida(int num_bebida){
             break;  
     }
 }
-
+ 
 void main(void) {
     setup();
     preAquecimento();
@@ -276,6 +277,8 @@ void main(void) {
                 delayMilisegundos(100); 
             } else {
                 continue;
+                delayMilisegundos(100); 
+                estado = 1;
             }   
             selecaoBebidas(escolha);
             prepararBebida(escolha);
