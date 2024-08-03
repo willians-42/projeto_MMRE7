@@ -246,7 +246,6 @@ void main(void) {
         AQUECIMENTO_TERMOBLOCO = 1;
         maquinaPronta();
         if (SENSOR_CAPACITIVO == 1){
-            delayMilisegundos(100);
             if (BOTAO_CAFE_CURTO == 0 && estado == 0){
                 escolha = 0;
                 estado = 1;
