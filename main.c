@@ -21,7 +21,6 @@
 #define BOTAO_CAPPUCCINO     PORTAbits.RA3
 #define BOTAO_CHOCOLATE      PORTAbits.RA4
 #define BOTAO_CHOCOLEITE     PORTAbits.RA5
-#define BOTAO_RESET          PORTAbits.RA6
 
 // sensor
 #define SENSOR_CAPACITIVO PORTCbits.RC0
@@ -131,7 +130,6 @@ void selecaoBebidas(int num_bebida){
             strcpy(str, "Chocoleite");
             break;
         default:
-            asm("RESET");
             break;  
     }
     lcd_limpa_tela();
@@ -150,7 +148,7 @@ void cafeCurto(){
     PORTB = 0b10001000; // 13 segundos - cessa entrada de agua
     delayMilisegundos(250);
     PORTB = 0b10000000; // encerrado
-    bebidaPronta();    
+    bebidaPronta();
 }
 
 void cafeLongo(){
@@ -248,44 +246,40 @@ void main(void) {
         AQUECIMENTO_TERMOBLOCO = 1;
         maquinaPronta();
         if (SENSOR_CAPACITIVO == 1){
-            while (escolha == -1)
-            {
-                if (BOTAO_CAFE_CURTO == 0 && estado == 0){
-                    escolha = 0;
-                    estado = 1;
-                    delayMilisegundos(100); // espera um pouco, trata o debounce
-                } else if (BOTAO_CAFE_LONGO == 0 && estado == 0) {
-                    escolha = 1;
-                    estado = 1;
-                    delayMilisegundos(100); 
-                } else if (BOTAO_CAFE_COM_LEITE == 0 && estado == 0) {
-                    escolha = 2;
-                    estado = 1;
-                    delayMilisegundos(100); 
-                } else if (BOTAO_CAPPUCCINO == 0 && estado == 0) {
-                    escolha = 3;
-                    estado = 1;
-                    delayMilisegundos(100); 
-                } else if (BOTAO_CHOCOLATE == 0 && estado == 0) {
-                    escolha = 4;
-                    estado = 1;
-                    delayMilisegundos(100); 
-                } else if (BOTAO_CHOCOLEITE == 0 && estado == 0) {
-                    escolha = 5;
-                    estado = 1 ;
-                    delayMilisegundos(100); 
-                } else if (BOTAO_RESET == 0 && estado == 0) {
-                    escolha = 6;
-                    estado = 1;
-                    delayMilisegundos(100); 
-                } 
+            if (BOTAO_CAFE_CURTO == 0 && estado == 0){
+                escolha = 0;
+                estado = 1;
+                delayMilisegundos(100); // espera um pouco, trata o debounce
+            } else if (BOTAO_CAFE_LONGO == 0 && estado == 0) {
+                escolha = 1;
+                estado = 1;
+                delayMilisegundos(100); 
+            } else if (BOTAO_CAFE_COM_LEITE == 0 && estado == 0) {
+                escolha = 2;
+                estado = 1;
+                delayMilisegundos(100); 
+            } else if (BOTAO_CAPPUCCINO == 0 && estado == 0) {
+                escolha = 3;
+                estado = 1;
+                delayMilisegundos(100); 
+            } else if (BOTAO_CHOCOLATE == 0 && estado == 0) {
+                escolha = 4;
+                estado = 1;
+                delayMilisegundos(100); 
+            } else if (BOTAO_CHOCOLEITE == 0 && estado == 0) {
+                escolha = 5;
+                estado = 1 ;
+                delayMilisegundos(100); 
+            } 
+            if ( estado == 1 && escolha != -1 ){
+                selecaoBebidas(escolha);
+                prepararBebida(escolha);
+
+                while(SENSOR_CAPACITIVO == 1){}
+                SENSOR_CAPACITIVO = 0;
+                estado = 0;
+                escolha = -1;
             }
-            
-            selecaoBebidas(escolha);
-            prepararBebida(escolha);
-            SENSOR_CAPACITIVO = 0;
-            estado = 0;
-            escolha = -1;
         } 
     }   
     return;
