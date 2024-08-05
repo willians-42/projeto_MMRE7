@@ -148,7 +148,6 @@ void cafeCurto(){
     PORTB = 0b10001000; // 13 segundos - cessa entrada de agua
     delayMilisegundos(250);
     PORTB = 0b10000000; // encerrado
-    bebidaPronta();
 }
 
 void cafeLongo(){
@@ -158,8 +157,7 @@ void cafeLongo(){
     delayMilisegundos(13000); 
     PORTB = 0b10001000; // 23 segundos - cessa entrada de agua
     delayMilisegundos(250); 
-    PORTB = 0b10000000; // encerrado
-    bebidaPronta(); 
+    PORTB = 0b10000000; // encerrado 
 }
 
 void cafeComLeite(){
@@ -171,8 +169,7 @@ void cafeComLeite(){
     delayMilisegundos(6000); 
     PORTB = 0b10000100; // 21 segundos - cessa entrada de agua -  esquerda
     delayMilisegundos(250);
-    PORTB = 0b10000000; // encerrado
-    bebidaPronta();   
+    PORTB = 0b10000000; // encerrado   
 }
 
 void cappuccino(){
@@ -186,8 +183,7 @@ void cappuccino(){
     delayMilisegundos(5000);
     PORTB = 0b10000100; // 20 segundos - cessa entrada de agua - esquerda
     delayMilisegundos(250);
-    PORTB = 0b10000000; // encerrado
-    bebidaPronta();     
+    PORTB = 0b10000000; // encerrado     
 }
 
 void chocolate(){
@@ -197,8 +193,7 @@ void chocolate(){
     delayMilisegundos(1000); 
     PORTB = 0b10000100; // 21 segundos - cessa entrada de agua - esquerda
     delayMilisegundos(250); 
-    PORTB = 0b10000000; // encerrado
-    bebidaPronta();  
+    PORTB = 0b10000000; // encerrado  
 }
 
 void chocoleite(){
@@ -208,8 +203,7 @@ void chocoleite(){
     delayMilisegundos(5000); // 
     PORTB = 0b10000100; // cessa entrada de agua - esquerda
     delayMilisegundos(250); // 
-    PORTB = 0b10000000; // encerrado
-    bebidaPronta(); 
+    PORTB = 0b10000000; // encerrado 
 }
 
 void prepararBebida(int num_bebida){
@@ -274,7 +268,8 @@ void main(void) {
             if ( estado == 1 && escolha != -1 ){
                 selecaoBebidas(escolha);
                 prepararBebida(escolha);
-
+                bebidaPronta();
+                
                 while(SENSOR_CAPACITIVO == 1){}
                 SENSOR_CAPACITIVO = 0;
                 estado = 0;
