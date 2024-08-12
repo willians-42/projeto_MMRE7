@@ -58,7 +58,7 @@ void delayMilisegundos(unsigned int milisegundos) {
     // Timer1 overflow ocorre a cada 65536 ciclos de clock
     // Fosc = 48MHz, então Fosc/4 = 12MHz, Prescaler 1:8
     // Timer1 incrementa a cada 0,6667µs (8 / 12MHz)
-    // Para 1 milissegundo (1.000µs), precisamos de 1.000µs / 0,6667µs ≈ 1500 ciclos de timer
+    // Para 1 milissegundo (1.000µs), precisamos de 1.000µs / 0,6667µs ? 1500 ciclos de timer
     // Como Timer1 conta até 65536, precisamos de múltiplos ciclos de Timer1 para chegar a 1 milissegundo
     // Preload = 65536 - 1500
 
@@ -142,57 +142,63 @@ void selecaoBebidas(int num_bebida){
 
 void cafeCurto(){
     PORTB = 0b11001010; // entrada de agua - direita, mixer - direita, molas de dosagem - cafe
-    delayMilisegundos(5000);  
-    PORTB = 0b10001010; // 5 segundos -  cessa mola de dosagem
-    delayMilisegundos(8000); // 
-    PORTB = 0b10001000; // 13 segundos - cessa entrada de agua
-    delayMilisegundos(250);
+    delayMilisegundos(10000);  
+    PORTB = 0b10001010; // 10 segundos -  cessa mola de dosagem
+    delayMilisegundos(2000); // 
+    PORTB = 0b10001000; // 12 segundos - cessa entrada de agua
     PORTB = 0b10000000; // encerrado
 }
 
 void cafeLongo(){
     PORTB = 0b11001010; // entrada de agua - direita, mixer - direta, molas de dosagem - cafe
-    delayMilisegundos(10000); 
-    PORTB = 0b10001010; // 10 segundos -  cessa mola de dosagem
-    delayMilisegundos(13000); 
-    PORTB = 0b10001000; // 23 segundos - cessa entrada de agua
-    delayMilisegundos(250); 
+    delayMilisegundos(20000); 
+    PORTB = 0b10001010; // 20 segundos -  cessa mola de dosagem
+    delayMilisegundos(1500); 
+    PORTB = 0b10001000; // 21.5 segundos - cessa entrada de agua 
     PORTB = 0b10000000; // encerrado 
 }
 
 void cafeComLeite(){
+    // CAFE
     PORTB = 0b11101111; // entrada de agua - direita e esquerda, mixer - esquerda e direita, molas de dosagem - cafe e leite
+    delayMilisegundos(4000); 
+    PORTB = 0b10101111; // cessa mola de dosagem - cafe 
+    delayMilisegundos(3000); // 
+    PORTB = 0b10100101;  // cessa entrada de agua - direita, mixer - direita
+    // LEITE
     delayMilisegundos(5000); 
-    PORTB = 0b10100101; // 5 segundos - cessa entrada de agua - direita, mixer - direita e mola de dosagem - cafe
-    delayMilisegundos(10000); 
-    PORTB = 0b10000101; // 15 segundos - cessa mola de dosagem - leite
-    delayMilisegundos(6000); 
-    PORTB = 0b10000100; // 21 segundos - cessa entrada de agua -  esquerda
-    delayMilisegundos(250);
+    PORTB = 0b10000101; // cessa mola de dosagem - leite
+    delayMilisegundos(3000); 
+    PORTB = 0b10000100; // cessa entrada de agua - esquerda
     PORTB = 0b10000000; // encerrado   
 }
 
 void cappuccino(){
-    PORTB = 0b11111111; // entrada de agua - direita e esquerda, mixer - esquerda e direita, molas de dosagem - chocolate, leite e cafe
-    delayMilisegundos(5000); 
-    PORTB = 0b10110101; // 5 segundos - cessa entrada de agua - direita, mixer - direita e mola de dosagem - cafe
-    delayMilisegundos(5000); 
-    PORTB = 0b10010101; // 10 segundos - cessa mola de dosagem - leite
-    delayMilisegundos(5000); 
-    PORTB = 0b10000101; // 15 segundos - cessa mola de dosagem -  chocolate
-    delayMilisegundos(5000);
-    PORTB = 0b10000100; // 20 segundos - cessa entrada de agua - esquerda
-    delayMilisegundos(250);
-    PORTB = 0b10000000; // encerrado     
+    // CAFE
+    PORTB = 0b11111111; // entrada de agua - direita e esquerda, mixer - esquerda e direita, molas de dosagem - cafe, leite e chocolate
+    delayMilisegundos(4000); 
+    PORTB = 0b10111111; // cessa mola de dosagem - cafe 
+    delayMilisegundos(3000); // 
+    PORTB = 0b10110101;  // cessa entrada de agua - direita, mixer - direita
+    // CHOCOLATE
+    delayMilisegundos(1000);
+    PORTB = 0b10100101; // cessa mola de dosagem - chocolate
+    // LEITE
+    delayMilisegundos(4000); 
+    PORTB = 0b10000101; // cessa mola de dosagem - leite
+    delayMilisegundos(2000); 
+    PORTB = 0b10000100; // cessa entrada de agua - esquerda
+    PORTB = 0b10000000; // encerrado        
 }
 
 void chocolate(){
-    PORTB = 0b10010101; // entrada de agua - esquerda, mixer - esquerda, molas de dosagem - chocolate
-    delayMilisegundos(20000); 
+    PORTB = 0b10110101; // entrada de agua - esquerda, mixer - esquerda, molas de dosagem - chocolate, molas de dosagem - leite
+    delayMilisegundos(10000); 
+    PORTB = 0b10010101; // 10 segundos - cessa mola de dosagem - leite
+    delayMilisegundos(5000); 
     PORTB = 0b10000101; // 20 segundos -  cessa mola de dosagem - chocolate
-    delayMilisegundos(1000); 
+    delayMilisegundos(6000); 
     PORTB = 0b10000100; // 21 segundos - cessa entrada de agua - esquerda
-    delayMilisegundos(250); 
     PORTB = 0b10000000; // encerrado  
 }
 
@@ -201,7 +207,7 @@ void chocoleite(){
     delayMilisegundos(15000); // 
     PORTB = 0b10000101; // 15 segundos - cessa molas de dosagem - chocolate e leite
     delayMilisegundos(5000); // 
-    PORTB = 0b10000100; // cessa entrada de agua - esquerda
+    PORTB = 0b10000100; // 20 segundos - cessa entrada de agua - esquerda
     delayMilisegundos(250); // 
     PORTB = 0b10000000; // encerrado 
 }
@@ -270,7 +276,7 @@ void main(void) {
                 prepararBebida(escolha);
                 bebidaPronta();
                 
-                while(SENSOR_CAPACITIVO == 1){}
+                while(SENSOR_CAPACITIVO == 1){} // espera copo ser retirado
                 SENSOR_CAPACITIVO = 0;
                 estado = 0;
                 escolha = -1;
