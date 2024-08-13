@@ -63,8 +63,8 @@ void delayMilisegundos(unsigned int milisegundos) {
     // Preload-HEX = FA24
     for (i = 0; i < milisegundos; i++) {
         for (unsigned int j = 0; j < 1; j++) {
-            TMR1H = FA; // Carregar valor alto do Timer1
-            TMR1L = 24; // Carregar valor baixo do Timer1
+            TMR1H = 0xFA; // Carregar valor alto do Timer1
+            TMR1L = 0x24; // Carregar valor baixo do Timer1
 
             PIR1bits.TMR1IF = 0; // Limpa a flag de interrupção do Timer1
             T1CONbits.TMR1ON = 1; // Liga o Timer1
