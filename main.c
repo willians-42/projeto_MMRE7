@@ -35,8 +35,7 @@ void setup(void){
     // display
     TRISD = 0x00; //RD0 a RD7 - saída para o LCD
     PORTD = 0x00; //Coloca portD em 0V.
-    lcd_inicia(0x28, 0x0f, 0x06); //lnicializa o display LCD alfanumérico com quatrolinhas de dados.
-    
+    lcd_inicia(0x28, 0x0C, 0x06); //lnicializa o display LCD alfanumérico com quatrolinhas de dados.
     // sensor capacitivo
     TRISCbits.RC0 = 1;
     SENSOR_CAPACITIVO = 0;
@@ -60,16 +59,12 @@ void delayMilisegundos(unsigned int milisegundos) {
     // Timer1 incrementa a cada 0,6667µs (8 / 12MHz)
     // Para 1 milissegundo (1.000µs), precisamos de 1.000µs / 0,6667µs ? 1500 ciclos de timer
     // Como Timer1 conta até 65536, precisamos de múltiplos ciclos de Timer1 para chegar a 1 milissegundo
-    // Preload = 65536 - 1500
-
-    // Simplificando o cálculo
-    unsigned int overflowCount = 1; // Número de overflows necessários para 1ms
-    unsigned int preload = 65536 - 1500; // Preload calculado para 1ms
-
+    // Preload = 65536 - 1500 = 64036
+    // Preload-HEX = FA24
     for (i = 0; i < milisegundos; i++) {
-        for (unsigned int j = 0; j < overflowCount; j++) {
-            TMR1H = (preload >> 8) & 0xFF; // Carregar valor alto do Timer1
-            TMR1L = preload & 0xFF; // Carregar valor baixo do Timer1
+        for (unsigned int j = 0; j < 1; j++) {
+            TMR1H = FA; // Carregar valor alto do Timer1
+            TMR1L = 24; // Carregar valor baixo do Timer1
 
             PIR1bits.TMR1IF = 0; // Limpa a flag de interrupção do Timer1
             T1CONbits.TMR1ON = 1; // Liga o Timer1
@@ -82,7 +77,6 @@ void delayMilisegundos(unsigned int milisegundos) {
 }
 
 void preAquecimento(void){
-    lcd_LD_cursor(0); // inibe a exibicao do cursor
     lcd_posicao (1,1);// desloca o cursor para a posicao determinada
     imprime_string_lcd("Em aquecimento"); //envia String para o Display LCD 
     lcd_posicao (2,1);// desloca o cursor para a posicao determinada
@@ -91,7 +85,6 @@ void preAquecimento(void){
 }
 
 void maquinaPronta(void){
-    lcd_LD_cursor(0); // inibe a exibicao do cursor
     lcd_posicao (1,1);// desloca o cursor para a posicao determinada
     imprime_string_lcd("Coloque o copo e"); //envia String para o Display LCD 
     lcd_posicao (2,1);// desloca o cursor para a posicao determinada
@@ -100,7 +93,6 @@ void maquinaPronta(void){
 
 void bebidaPronta(void){
     lcd_limpa_tela();
-    lcd_LD_cursor(0); // inibe a exibicao do cursor
     lcd_posicao (1,1);// desloca o cursor para a posicao determinada
     imprime_string_lcd("Bebida pronta"); //envia String para o Display LCD 
     lcd_posicao (2,1);// desloca o cursor para a posicao determinada
@@ -133,7 +125,6 @@ void selecaoBebidas(int num_bebida){
             break;  
     }
     lcd_limpa_tela();
-    lcd_LD_cursor(0); // inibe a exibicao do cursor
     lcd_posicao (1,1);// desloca o cursor para a posicao determinada
     imprime_string_lcd(str); //envia String para o Display LCD 
     lcd_posicao (2,1);// desloca o cursor para a posicao determinada
@@ -276,7 +267,7 @@ void main(void) {
                 prepararBebida(escolha);
                 bebidaPronta();
                 
-                while(SENSOR_CAPACITIVO == 1){} // espera copo ser retirado
+                while(SENSOR_CAPACITIVO == 1);
                 SENSOR_CAPACITIVO = 0;
                 estado = 0;
                 escolha = -1;
